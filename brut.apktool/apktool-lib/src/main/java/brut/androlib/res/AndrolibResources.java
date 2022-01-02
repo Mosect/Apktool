@@ -479,6 +479,12 @@ final public class AndrolibResources {
             cmd.add("-v");
         }
 
+        if (buildOptions.outputRTxt) {
+            cmd.add("--output-text-symbols");
+            File file = new File(resourcesZip.getParentFile(), "R.txt");
+            cmd.add(file.getAbsolutePath());
+        }
+
         if (resourcesZip != null) {
             cmd.add(resourcesZip.getAbsolutePath());
         }

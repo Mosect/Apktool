@@ -38,6 +38,8 @@ public class BuildOptions {
 
     public int aaptVersion = 1; // default to v1
 
+    public boolean outputRTxt = false; // output R.txt
+
     public boolean isAapt2() {
         return this.useAapt2 || this.aaptVersion == 2;
     }

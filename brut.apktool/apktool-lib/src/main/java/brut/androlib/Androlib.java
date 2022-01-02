@@ -336,6 +336,34 @@ public class Androlib {
         LOGGER.info("Built apk...");
     }
 
+    public void buildRes(ExtFile appDir) throws BrutException {
+        LOGGER.info("Using Apktool " + Androlib.getVersion());
+
+        MetaInfo meta = readMetaFile(appDir);
+        buildOptions.isFramework = meta.isFrameworkApk;
+        buildOptions.resourcesAreCompressed = meta.compressionType;
+        buildOptions.doNotCompress = meta.doNotCompress;
+        buildOptions.outputRTxt = true;
+
+        mAndRes.setSdkInfo(meta.sdkInfo);
+        mAndRes.setPackageId(meta.packageInfo);
+        mAndRes.setPackageRenamed(meta.packageInfo);
+        mAndRes.setVersionInfo(meta.versionInfo);
+        mAndRes.setSharedLibrary(meta.sharedLibrary);
+        mAndRes.setSparseResources(meta.sparseResources);
+
+        if (meta.sdkInfo != null && meta.sdkInfo.get("minSdkVersion") != null) {
+            String minSdkVersion = meta.sdkInfo.get("minSdkVersion");
+            mMinSdkVersion = mAndRes.getMinSdkVersionFromAndroidCodename(meta, minSdkVersion);
+        }
+
+        new File(appDir, APK_DIRNAME).mkdirs();
+
+        buildResources(appDir, meta.usesFramework);
+
+        LOGGER.info("Built res R.txt...");
+    }
+
     private void buildManifestFile(File appDir, File manifest, File manifestOriginal)
             throws AndrolibException {
 
@@ -810,6 +838,7 @@ public class Androlib {
 
     private final static String SMALI_DIRNAME = "smali";
     private final static String APK_DIRNAME = "build/apk";
+    private final static String AAR_DIRNAME = "build/aar";
     private final static String UNK_DIRNAME = "unknown";
     private final static String[] APK_RESOURCES_FILENAMES = new String[] {
             "resources.arsc", "AndroidManifest.xml", "res" };

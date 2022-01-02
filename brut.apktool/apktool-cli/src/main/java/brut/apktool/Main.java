@@ -23,6 +23,7 @@ import brut.androlib.err.OutDirExistsException;
 import brut.androlib.options.BuildOptions;
 import brut.common.BrutException;
 import brut.directory.DirectoryException;
+import brut.directory.ExtFile;
 import brut.util.AaptManager;
 import brut.util.OSDetection;
 import org.apache.commons.cli.*;
@@ -252,7 +253,11 @@ public class Main {
             if (cli.hasOption("a") || cli.hasOption("aapt")) {
                 buildOptions.aaptVersion = AaptManager.getAaptVersion(cli.getOptionValue("a"));
             }
-            new Androlib(buildOptions).build(new File(appDirName), outFile);
+            if (cli.hasOption("r-txt")) {
+                new Androlib(buildOptions).buildRes(new ExtFile(new File(appDirName)));
+            } else {
+                new Androlib(buildOptions).build(new File(appDirName), outFile);
+            }
         } catch (BrutException ex) {
             System.err.println(ex.getMessage());
             System.exit(1);
@@ -417,6 +422,11 @@ public class Main {
                 .desc("Loads aapt from specified location.")
                 .build();
 
+        Option rTxtOption = Option.builder()
+                .longOpt("r-txt")
+                .desc("Only build res R.txt, not a apk file.")
+                .build();
+
         Option aapt2Option = Option.builder()
                 .longOpt("use-aapt2")
                 .desc("Upgrades apktool to use experimental aapt2 binary.")
@@ -495,6 +505,7 @@ public class Main {
         buildOptions.addOption(outputBuiOption);
         buildOptions.addOption(frameDirOption);
         buildOptions.addOption(forceBuiOption);
+        buildOptions.addOption(rTxtOption);
 
         // add basic framework options
         frameOptions.addOption(tagOption);
